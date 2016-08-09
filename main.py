@@ -12,7 +12,7 @@ from functools import partial
 scrnBtnCount = 6
 
 #Sets of pins for each button, in order
-pinPairs = [{'in':4,'out':18},{'in':17,'out':23},{'in':27,'out':24},{'in':22,'out':25}{'in':5,'out':12},{'in':6,'out':16}]
+pinPairs = [{'in':4,'out':18},{'in':17,'out':23},{'in':27,'out':24},{'in':22,'out':25},{'in':5,'out':12},{'in':6,'out':16}]
 
 #Setup the GPIO input and output pins
 GPIO.setmode(GPIO.BCM)
@@ -24,7 +24,7 @@ time_stamp = time.time()
 
 
 class RootWidget(BoxLayout):
-	'''This the class representing your root widget.
+	'''This is the class representing your root widget.
 		By default it is inherited from BoxLayout,
 		you can use any other layout/widget depending on your usage.
 	'''
