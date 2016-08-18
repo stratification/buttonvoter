@@ -45,8 +45,10 @@ class MainApp(App):
 	screenBtnCount = 0
 
 	def buttonCallback(self,btnDict,channel):
-		GPIO.output(btnDict['outPin'], True)
-		self.activateScreenBtn(btnDict)
+		time.sleep(0.1)
+		if GPIO.input(btnDict['inPin']):
+			GPIO.output(btnDict['outPin'], True)
+			self.activateScreenBtn(btnDict)
 		
 	def activateScreenBtn(self,newBtn):
 		try:
@@ -57,6 +59,7 @@ class MainApp(App):
 			self.maintBtns()
 			
 	def buttonPress(self,btnDict,thisBtn):
+		#Wait briefly and check for input again (trying to remove false positives)
 		GPIO.output(btnDict['outPin'], False)
 		thisBtn.text = btnDict['name']
 		thisBtn.disabled = 1
