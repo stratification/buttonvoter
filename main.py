@@ -45,6 +45,7 @@ class MainApp(App):
 	screenBtnCount = 0
 
 	def buttonCallback(self,btnDict,channel):
+		#Wait briefly and check for input again (trying to remove false positives)
 		time.sleep(0.1)
 		if GPIO.input(btnDict['inPin']):
 			GPIO.output(btnDict['outPin'], True)
@@ -55,29 +56,36 @@ class MainApp(App):
 			self.buttonList.index(newBtn)
 		except ValueError:
 			self.buttonList.append(newBtn)
-			self.mainWidget.ids['mainGrid'].children[newBtn['btnPos']].disabled = 0
 			self.maintBtns()
 			
-	def buttonPress(self,btnDict,thisBtn):
-		#Wait briefly and check for input again (trying to remove false positives)
-		GPIO.output(btnDict['outPin'], False)
-		thisBtn.text = btnDict['name']
+	def buttonPress(self,thisBtn):
+		#thisBtn.text = ""
 		thisBtn.disabled = 1
-		self.buttonList.remove(btnDict)
+		removeBtn = 0
+		btnName = thisBtn.text
+		for eachBtn in self.buttonList:
+			if eachBtn['name'] == btnName:
+				removeBtn = self.buttonList.index(eachBtn)
+				GPIO.output(eachBtn['outPin'], False)
+		self.buttonList.pop(removeBtn);
 		self.maintBtns()
 		
 	def maintBtns(self):
+		self.clearAll(0,False)
 		i = 1
 		for thisBtn in self.buttonList:
-			self.mainWidget.ids['mainGrid'].children[i-1].text = str(i) + " " + thisBtn['name']
+			self.mainWidget.ids['mainGrid'].children[self.ti-i].text = thisBtn['name']
+			self.mainWidget.ids['mainGrid'].children[self.ti-i].disabled = 0
+			print thisBtn['name']
 			i = i + 1
 	
-	def clearAll(self,btn):
+	def clearAll(self,btn=0,dump=True):
 		for btnItem in self.buttonDef:
-			GPIO.output(btnItem['outPin'], False)
 			self.mainWidget.ids['mainGrid'].children[btnItem['btnPos']].disabled = 1
-			self.mainWidget.ids['mainGrid'].children[btnItem['btnPos']].text = btnItem['name']
-			self.buttonList = []
+			self.mainWidget.ids['mainGrid'].children[btnItem['btnPos']].text = ""
+			if dump:
+				self.buttonList = []
+				GPIO.output(btnItem['outPin'], False)
 	
 	#Clean up application on exit
 	def exitBtn(self,btn):
@@ -108,16 +116,13 @@ class MainApp(App):
 		
 		self.mainWidget.ids['clearButton'].bind(on_press=self.clearAll)
 		
-		self.mainWidget.ids['exitButton'].bind(on_press=self.exitBtn)
-		
 		#Set up physical buttons
 		for btnItem in self.buttonDef:
 			GPIO.add_event_detect(btnItem['inPin'], GPIO.RISING, callback=partial(self.buttonCallback,btnItem), bouncetime=300)
 			GPIO.output(btnItem['outPin'], False)
-			buttoncallback = partial(self.buttonPress,btnItem)
-			curBtn = self.mainWidget.ids['mainGrid'].children[btnItem['btnPos']]
-			curBtn.bind(on_press=buttoncallback)
-			curBtn.text = btnItem['name']
+			#scrnCallback = partial(self.buttonPress,btnItem['name'])
+			self.mainWidget.ids['mainGrid'].children[btnItem['btnPos']].bind(on_press=self.buttonPress)
+			#curBtn.text = btnItem['name']
 			
 		self.btnFlash()
 			
