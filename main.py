@@ -33,7 +33,7 @@ class RootWidget(BoxLayout):
 
 class MainApp(App):
 	#Name assigned to each button in order
-	personList = ["Karen Liebrecht", "David Curnel", "Bill Ecrect","Ryann Leonard","Don Myers","Mike Norman"]
+	personList = ["Karen Liebrecht", "David Curnel", "Bill Ecret","Ryann Leonard","Don Myers","Mike Norman"]
 	buttonDef = []
 	
 	ti = 0
@@ -46,7 +46,7 @@ class MainApp(App):
 
 	def buttonCallback(self,btnDict,channel):
 		#Wait briefly and check for input again (trying to remove false positives)
-		time.sleep(0.1)
+		time.sleep(0.05)
 		if GPIO.input(btnDict['inPin']):
 			GPIO.output(btnDict['outPin'], True)
 			self.activateScreenBtn(btnDict)
@@ -59,7 +59,6 @@ class MainApp(App):
 			self.maintBtns()
 			
 	def buttonPress(self,thisBtn):
-		#thisBtn.text = ""
 		thisBtn.disabled = 1
 		removeBtn = 0
 		btnName = thisBtn.text
@@ -120,10 +119,7 @@ class MainApp(App):
 		for btnItem in self.buttonDef:
 			GPIO.add_event_detect(btnItem['inPin'], GPIO.RISING, callback=partial(self.buttonCallback,btnItem), bouncetime=300)
 			GPIO.output(btnItem['outPin'], False)
-			#scrnCallback = partial(self.buttonPress,btnItem['name'])
 			self.mainWidget.ids['mainGrid'].children[btnItem['btnPos']].bind(on_press=self.buttonPress)
-			#curBtn.text = btnItem['name']
-			
 		self.btnFlash()
 			
 		return self.mainWidget
